@@ -1,0 +1,223 @@
+const canvas = document.getElementById('hangmanCanvas');
+const context = canvas.getContext('2d');
+const wordDisplay = document.getElementById('wordDisplay');
+const lettersContainer = document.getElementById('lettersContainer');
+
+const categories = [
+['APPLE', 'BANANA', 'ORANGE', 'KIWI', 'STRAWBERRY', 'GRAPE', 'LEMON', 'PEACH', 'PEAR', 'PINEAPPLE', 'MANGO', 'WATERMELON', 'BLUEBERRY', 'RASPBERRY', 'BLACKBERRY', 'CHERRY', 'GRAPEFRUIT', 'PLUM', 'APRICOT', 'FIG'],
+['LION', 'TIGER', 'BEAR', 'WOLF', 'ELEPHANT', 'GIRAFFE', 'RHINOCEROS', 'HIPPOPOTAMUS', 'KANGAROO', 'PANDA', 'MONKEY', 'GORILLA', 'ZEBRA', 'CROCODILE', 'SNAKE', 'LEOPARD', 'CHEETAH', 'JAGUAR', 'BUFFALO', 'WHALE'],
+['UNITEDSTATES','CHINA', 'UNITEDKINGDOM', 'RUSSIA', 'BRAZIL', 'INDIA', 'JAPAN', 'CANADA', 'MEXICO', 'FRANCE', 'GERMANY', 'ITALY', 'SPAIN', 'AUSTRALIA', 'SOUTHAFRICA', 'ARGENTINA', 'NIGERIA', 'EGYPT', 'SAUDIARABIA', 'NORWAY']
+];
+
+let currentWord;
+let guessedLetters;
+let attempts;
+const maxAttempts = 8;
+let currentCategory;
+
+function startGame(wordList) {
+  currentCategory = wordList;
+  currentWord = getRandomWord(wordList);
+  guessedLetters = new Set();
+  attempts = maxAttempts;
+
+  drawHangman(attempts);
+  displayWord();
+  createLetterButtons();
+  updateRemainingAttempts();
+  document.body.classList.remove('failure');
+}
+function updateRemainingAttempts() {
+  const remainingAttemptsElement = document.getElementById('remainingAttempts');
+  remainingAttemptsElement.textContent = 'Remaining attempts: ' + attempts;
+}
+function resetGame() {
+  document.querySelector('.game-result.success').hidden = true;
+  document.querySelector('.game-result.failure').hidden = true;
+  startGame(currentCategory);
+  document.body.classList.remove('failure');
+}
+
+function getRandomWord(wordList) {
+  const index = Math.floor(Math.random() * wordList.length);
+  return wordList[index];
+}
+
+function drawHangman(attempts) {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw base
+  if (attempts <= maxAttempts) {
+    context.beginPath();
+    context.moveTo(50, 230);
+    context.lineTo(200, 230);
+    context.stroke();
+  }
+
+  // Draw gallows
+  if (attempts <= maxAttempts - 1) {
+    context.beginPath();
+    context.moveTo(100, 230);
+    context.lineTo(100, 50);
+    context.stroke();
+  }
+
+  // Draw horizontal beam
+  if (attempts <= maxAttempts - 2) {
+    context.beginPath();
+    context.moveTo(100, 50);
+    context.lineTo(150, 50);
+    context.stroke();
+  }
+
+  // Draw rope
+  if (attempts <= maxAttempts - 3) {
+    context.beginPath();
+    context.moveTo(150, 50);
+    context.lineTo(150, 80);
+    context.stroke();
+  }
+
+  // Draw head
+  if (attempts <= maxAttempts - 4) {
+    context.beginPath();
+    context.arc(150, 100, 20, 0, 2 * Math.PI);
+    context.stroke();
+  }
+
+  // Draw body
+  if (attempts <= maxAttempts - 5) {
+    context.beginPath();
+    context.moveTo(150, 120);
+    context.lineTo(150, 190);
+    context.stroke();
+  }
+
+  // Draw left hand
+  if (attempts <= maxAttempts - 6) {
+    context.beginPath();
+    context.moveTo(150, 140);
+    context.lineTo(130, 170);
+    context.stroke();
+  }
+
+  // Draw right hand
+  if (attempts <= maxAttempts - 7) {
+    context.beginPath();
+    context.moveTo(150, 140);
+    context.lineTo(170, 170);
+    context.stroke();
+  }
+
+  // Draw left foot
+  if (attempts <= maxAttempts - 8) {
+    context.beginPath();
+    context.moveTo(150, 190);
+    context.lineTo(130, 220);
+    context.stroke();
+  }
+
+  // Draw right foot
+  if (attempts <= maxAttempts - 9) {
+    context.beginPath();
+    context.moveTo(150, 190);
+    context.lineTo(170, 220);
+    context.stroke();
+  }
+}
+function displayWord() {
+  const word = currentWord
+  .split('')
+    .map((letter) => (guessedLetters.has(letter) ? letter : '_'))
+    .join(' ');
+
+  wordDisplay.textContent = word;
+}
+
+function createLetterButtons() {
+  lettersContainer.innerHTML = '';
+
+  for (let i = 65; i <= 90; i++) {
+    const letter = String.fromCharCode(i);
+    const button = document.createElement('button');
+    button.textContent = letter;
+    button.addEventListener('click', () => {
+      
+      guessedLetters.add(letter);
+      button.disabled = true;
+      button.style.backgroundColor = 'gray';
+
+      if (currentWord.includes(letter)) {
+        displayWord();
+        checkGameStatus();
+      } else {
+        attempts--;
+        drawHangman(attempts);
+        checkGameStatus();
+      }
+
+updateRemainingAttempts();
+    });
+
+    lettersContainer.appendChild(button);
+  }
+}
+
+function checkGameStatus() {
+  if (attempts < 0) {
+    gameOver(false);
+  } else if (currentWord.split('').every((letter) => guessedLetters.has(letter))) {
+    gameOver(true);
+  }
+}
+
+function gameOver(won) {
+  if (won) {
+    document.querySelector('.game-result.success').hidden = false;
+  } else {
+    document.querySelector('.game-result.failure').hidden = false;
+    document.querySelector('.failed-word').textContent = currentWord;
+    document.body.classList.add('failure');
+  }
+
+  lettersContainer.innerHTML = '';
+}
+
+document.getElementById('playAgainSuccess').addEventListener('click', resetGame);
+document.getElementById('playAgainFailure').addEventListener('click', resetGame);
+
+document.getElementById('chooseCategoryFailure').addEventListener('click', () => {
+  document.querySelector('.game-result.failure').hidden = true;});
+  document.getElementById('viewCustomCategories').addEventListener('click', () => {
+  alert('Custom Categories:\n' + currentCategory.join(', '));
+
+});
+
+document.getElementById('cat1').addEventListener('click', () => startGame(categories[0]));
+document.getElementById('cat2').addEventListener('click', () => startGame(categories[1]));
+document.getElementById('cat3').addEventListener('click', () => startGame(categories[2]));
+
+document.getElementById('customCat').addEventListener('click', () => {
+  const customWords = prompt('Enter custom words separated by commas:').toUpperCase().split(',');
+  startGame(customWords);
+});
+
+document.getElementById('inputSubmit').addEventListener('click', () => {
+  const inputLetter = document.getElementById('inputLetter').value.toUpperCase();
+if (inputLetter.length === 1 && inputLetter.match(/[A-Z]/i)) {
+  guessedLetters.add(inputLetter);
+
+  if (currentWord.includes(inputLetter)) {
+    displayWord();
+    checkGameStatus();
+  } else {
+    attempts--;
+    drawHangman(attempts);
+    checkGameStatus();
+    updateRemainingAttempts();
+  }
+
+  createLetterButtons();
+}
+  document.getElementById('inputLetter').value = '';
+});
