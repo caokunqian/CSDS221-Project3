@@ -1,0 +1,89 @@
+h1 {
+  color: red;
+  font-size: 3em;
+  text-align: center;
+}
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.container {
+  background-color: white;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 650px;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+#viewCustomCategories{
+  background-color:blue;
+}
+#viewCustomCategories:hover {
+  background-color:red;
+}
+button:hover {
+  background-color: rgba(3, 253, 95, 0.8);
+}
+
+.letters button {
+  display: inline-block;
+  margin: 5px;
+  width: 25px;
+}
+
+.word-display {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.game-result {
+  text-align: center;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+}
+
+body.failure {
+  background-color: red;
+}
+
+#hangmanCanvas {
+  display: block;
+  margin: 0 auto; /* Add this line to center the canvas */
+  transform: scale(1.2); /* Add this line to enlarge the hangman */
+}
+
+#categoriesContainer {
+  background-color: rgba(3, 239, 253, 0.8);
+
+  padding: 1em;
+  display: inline-flex;
+  justify-content: space-around;
+  border-radius: 15px;
+}
